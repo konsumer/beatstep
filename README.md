@@ -27,7 +27,7 @@ beatstep seq -i 1   # start sequencer on device-1
 
 You can also use this as a nice BeatStep interface library, too.
 
-```
+```js
 import BeatStep from 'beatstep'
 import easymidi from 'easymidi'
 
@@ -86,9 +86,8 @@ These are params that chnage how the controller works, on a global-scale.
 
 These apply to individuals controls. The available controls are these:
 
-```
 These are the the encoders or knobs:
-
+```
 ENC1
 ENC2
 ENC3
@@ -105,10 +104,10 @@ ENC13
 ENC14
 ENC15
 ENC16
-
+```
 
 These are the pads:
-
+```
 PAD1
 PAD2
 PAD3
@@ -125,10 +124,10 @@ PAD13
 PAD14
 PAD15
 PAD16
-
+```
 
 These are the other controls, on the left of device:
-
+```
 VOLUME
 STOP
 PLAY
