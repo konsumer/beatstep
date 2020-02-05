@@ -6,19 +6,19 @@ It starts a virtual midi device that can be plugged into other software.
 
 ## installation
 
-```
+```bash
 npm i -g beatstep
 ```
 
 You can also run it without installing:
 
-```
+```bash
 npx beatstep list
 ```
 
 ## usage
 
-```
+```bash
 beatstep list       # list MIDI devices
 beatstep seq -i 1   # start sequencer on device-1
 ```
