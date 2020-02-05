@@ -82,7 +82,6 @@ class Controller {
     this.send = this.output.send.bind(this.output)
   }
 
-  // https://www.untergeek.de/2014/11/taming-arturias-beatstep-sysex-codes-for-programming-via-ipad/
   // defaults to pp setting for whole controller (0x01), vs 0x02-0x06 (which desktop software does)
   setParameter (vv, pp = 0x01) {
     this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x02, 0x00, pp, this.num, vv, 0xF7])

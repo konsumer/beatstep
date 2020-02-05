@@ -43,3 +43,7 @@ console.log(beatstep.PAD1.color)
 ### TODO
 
 Need full docs here. global & controller getter/setters.
+
+## thanks
+
+I couldn't have made this without the awesome hacking in this [blog post](https://www.untergeek.de/2014/11/taming-arturias-beatstep-sysex-codes-for-programming-via-ipad/).
