@@ -1,4 +1,5 @@
 import { Input, Output } from 'easymidi'
+import scale from 'scale-number-range'
 
 // supported cc controllers
 export const controllers = {
@@ -72,9 +73,22 @@ export const padVelocityModes = {
   FULL: 0x03
 }
 
+export const stepSizes = {
+  4: 0x00,
+  8: 0x01,
+  16: 0x02,
+  32: 0x03
+}
+
+export const legatoModes = {
+  OFF: 0x00,
+  ON: 0x01,
+  RESET: 0x02
+}
+
 const DEBUG = true
 
-class Controller {
+export class Controller {
   constructor (name, num, input) {
     this.output = new Output(input)
     this.name = name
@@ -87,7 +101,7 @@ class Controller {
     this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x02, 0x00, pp, this.num, vv, 0xF7])
   }
 
-  getParamater (vv, pp = 0x01) {
+  getParamater (pp = 0x01) {
     this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x02, 0x00, pp, this.num, 0xF7])
   }
 
@@ -103,7 +117,7 @@ class Controller {
   }
 }
 
-export default class BeatStep {
+export class BeatStep {
   constructor (input = 'Arturia BeatStep:Arturia BeatStep MIDI 1 20:0', output = 'BeatStep interceptor') {
     this.input = new Input(input)
     this.input_out = new Output(input)
@@ -113,15 +127,30 @@ export default class BeatStep {
     this.send = this.output.send.bind(this.output)
     this.on = this.input.on.bind(this.input)
 
+    // makes auto-resolutions for getter/setters work
     this.controllers = {}
     Object.keys(controllers).forEach((c, i) => {
       this[c] = new Controller(c, controllers[c], input)
     })
+
+    // allow user to reference possible values for things
+    this.scales = Object.keys(scales)
+    this.modes = Object.keys(seqmodes)
+    this.stepSizes = Object.keys(stepSizes)
+    this.knobAccelerationModes = Object.keys(knobAccelerationModes)
+    this.padVelocityModes = Object.keys(padVelocityModes)
+    this.legatoModes = Object.keys(legatoModes)
   }
 
   setParameter (cc, vv, pp = 0x50) {
     this.input_out.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x0, 0x00, pp, cc, vv, 0xF7])
   }
+
+  getParameter (cc, pp = 0x50) {
+    this.input_out.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x0, 0x00, pp, cc, 0xF7])
+  }
+
+  // global getter/setters
 
   set channel (c) {
     this.setParameter(0x01, c)
@@ -136,18 +165,42 @@ export default class BeatStep {
   }
 
   set mode (c) {
-    this.setParameter(0x03, seqmodes[c.toUpperCase()])
+    this.setParameter(0x04, seqmodes[c.toUpperCase()])
+  }
+
+  set step (c) {
+    this.setParameter(0x05, stepSizes[c])
+  }
+
+  set patternLength (c) {
+    this.setParameter(0x06, c)
+  }
+
+  set swing (c) {
+    // 0-1 = 0x32-0x4B
+    this.setParameter(0x07, Math.floor(scale(c, 0, 1, 0x32, 0x4B)))
+  }
+
+  set gate (c) {
+    // 0-1 = 0x00-0x63
+    this.setParameter(0x08, Math.floor(scale(c, 0, 1, 0x00, 0x63)))
+  }
+
+  set lagato (c) {
+    this.setParameter(0x09, legatoModes[c.toUpperCase()])
   }
 
   set cvChannel (c) {
     this.setParameter(0x0C, c)
   }
 
+  set paddVelocityCurve (c) {
+    this.setParameter(0x03, padVelocityModes[c.toUpperCase()], 0x41)
+  }
+
   set knobAcceleration (c) {
     this.setParameter(0x04, knobAccelerationModes[c.toUpperCase()], 0x41)
   }
-
-  set paddVelocityCurve (c) {
-    this.setParameter(0x04, padVelocityModes[c.toUpperCase()], 0x41)
-  }
 }
+
+export default BeatStep

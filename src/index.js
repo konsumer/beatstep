@@ -11,6 +11,10 @@ const sequencer = (input, output) => {
   const beatstep = new BeatStep(input, output)
 
   beatstep.PAD1.LED = true
+
+  beatstep.on('noteon', console.log)
+  beatstep.on('noteoff', console.log)
+  beatstep.on('cc', console.log)
 }
 
 yargs
@@ -37,6 +41,6 @@ yargs
         default: 'BeatStep interceptor'
       })
   }, ({ input, output }) => {
-    sequencer(devices[input], output)
+    sequencer(devices[input - 1], output)
   })
   .argv

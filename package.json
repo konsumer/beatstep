@@ -25,6 +25,7 @@
   "dependencies": {
     "chalk": "^3.0.0",
     "easymidi": "^1.0.3",
+    "scale-number-range": "^1.0.3",
     "yargs": "^15.1.0"
   },
   "devDependencies": {
