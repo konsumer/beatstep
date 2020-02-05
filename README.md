@@ -198,8 +198,8 @@ You can only control red LEDs (even though the device also has blue.) Also, the 
 ```js
 // setup
 beatstep.PAD1.channel = 0x01
-beatstep.PAD1.mode = 'NOTE'
 beatstep.PAD1.note = 0x3C // C4
+beatstep.PAD1.mode = 'NOTE'
 beatstep.PAD1.behavior = 'GATE'
 
 // turn on LED
