@@ -163,7 +163,7 @@ export class BeatStep {
     this.setParameter(0x03, scales[c.toUpperCase().replace(' ', '_')])
   }
 
-  set mode (c) {
+  set seqmode (c) {
     this.setParameter(0x04, seqmodes[c.toUpperCase()])
   }
 

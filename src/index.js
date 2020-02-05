@@ -1,22 +1,9 @@
-import easymidi from 'easymidi'
+import { getInputs } from 'easymidi'
 import yargs from 'yargs'
-import chalk from 'chalk'
 
-import BeatStep from './BeatStep'
+import sequencer from './sequencer'
 
-const devices = easymidi.getInputs()
-
-const sequencer = (input, output) => {
-  console.log(chalk.green('Press Ctrl-C to quit.'))
-  const beatstep = new BeatStep(input)
-  const out = new easymidi.Output(output, true)
-
-  beatstep.PAD1.LED = true
-
-  beatstep.on('noteon', console.log)
-  beatstep.on('noteoff', console.log)
-  beatstep.on('cc', console.log)
-}
+const devices = getInputs()
 
 yargs
   .command('list', 'List MIDI devices',
