@@ -91,22 +91,6 @@ The class constructor has 2 params, which are the names of input and output devi
 
 The class uses getters & setters to communicate with the controller, so you can very simply tell it to do things, and get values, as if they're just variables. All the getters return Promises.
 
-### examples
-
-```js
-import BeatStep from 'beatstep'
-import { getInputs } from 'easymidi'
-
-const device = getInputs().find(d => d.includes('Arturia BeatStep'))
-const beatstep = new BeatStep(device)
-
-async function run () {
-  // get 
-  console.log(await beatstep.PAD1.color)
-}
-
-run()
-```
 
 ### global
 
@@ -212,7 +196,7 @@ beatstep.send('noteoff', { note: 0x3C, channel: 0x01, velocity: 0x00 })
 
 ### TODO
 
-Fill in the docs.
+Fill in the docs: api & docs.
 
 ## thanks
 
