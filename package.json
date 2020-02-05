@@ -1,0 +1,34 @@
+{
+  "name": "beatstep",
+  "version": "0.0.0",
+  "description": "Intercept beatstep and make it work in different ways",
+  "main": "./dist/BeatStep.js",
+  "exports": "./src/BeatStep.js",
+  "scripts": {
+    "start": "node -r esm src/index.js seq",
+    "build": "ncc src/index.js"
+  },
+  "bin": {
+    "beatstep": "dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/konsumer/beatstep.git"
+  },
+  "keywords": [],
+  "author": "David Konsumer <konsumer@jetboystudio.com> (http://konsumer.js.org)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/konsumer/beatstep/issues"
+  },
+  "homepage": "https://github.com/konsumer/beatstep#readme",
+  "dependencies": {
+    "chalk": "^3.0.0",
+    "easymidi": "^1.0.3",
+    "yargs": "^15.1.0"
+  },
+  "devDependencies": {
+    "@zeit/ncc": "^0.21.0",
+    "esm": "^3.2.25"
+  }
+}
