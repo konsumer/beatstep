@@ -189,21 +189,24 @@ STOP
 PLAY
 ```
 
-#### LED colors
+#### LEDs
 
 It's totally possible to control LEDs, but there are a few caveats.
 
-You can only control red LEDs (even though the device also has blue.) Also, the pad needs to be in `NOTE` mode to respond.
+You can only control red LEDs (even though the device also has blue.) Also, the pad needs to be in `NOTE` mode to respond. After that send noteon/noteoff messages to control LEDs.
 
 ```js
 // setup
-beatstep.PAD1.channel = 1
+beatstep.PAD1.channel = 0x01
 beatstep.PAD1.mode = 'NOTE'
-beatstep.PAD1.note = 60 // C4
+beatstep.PAD1.note = 0x3C // C4
 beatstep.PAD1.behavior = 'GATE'
 
 // turn on LED
-beatstep.PAD1.LED = true
+beatstep.send('noteon', { note: 0x3C, channel: 0x01, velocity: 0xFF })
+
+// turn off LED
+beatstep.send('noteoff', { note: 0x3C, channel: 0x01, velocity: 0x00 })
 ```
 
 

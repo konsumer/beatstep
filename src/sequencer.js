@@ -18,7 +18,7 @@ export const sequencer = async (input, output, name) => {
     beatstep[pad].channel = 1
     beatstep[pad].mode = 'NOTE'
     beatstep[pad].behavior = 'GATE'
-    beatstep[pad].LED = true
+    beatstep[pad].note = 0x3C + i
   })
 }
 

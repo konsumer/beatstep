@@ -124,10 +124,6 @@ export class Controller {
     this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x02, 0x00, pp, this.num, 0xF7])
   }
 
-  set LED (on) {
-    this.send('noteon', { note: this.noteNum, velocity: on ? 0x7F : 0x00 })
-  }
-
   set channel (c) {
     this.setParameter(c, 0x02)
   }
