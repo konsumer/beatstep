@@ -29,11 +29,9 @@ You can also use this as a nice BeatStep interface library, too.
 
 ```js
 import BeatStep from 'beatstep'
-import easymidi from 'easymidi'
+import { getInputs } from 'easymidi'
 
-const device = easymidi.getInputs().find(d => d.includes('Arturia BeatStep'))
-
-const beatstep = new BeatStep(device)
+const beatstep = new BeatStep(getInputs().find(d => d.includes('Arturia BeatStep')))
 ```
 
 The first param is the name of input-device, as it appears in `require('easymidi').getInputs()`.
