@@ -8,7 +8,8 @@ const devices = easymidi.getInputs()
 
 const sequencer = (input, output) => {
   console.log(chalk.green('Press Ctrl-C to quit.'))
-  const beatstep = new BeatStep(input, output)
+  const beatstep = new BeatStep(input)
+  const out = new easymidi.Output(output, true)
 
   beatstep.PAD1.LED = true
 

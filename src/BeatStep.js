@@ -118,13 +118,12 @@ export class Controller {
 }
 
 export class BeatStep {
-  constructor (input = 'Arturia BeatStep:Arturia BeatStep MIDI 1 20:0', output = 'BeatStep interceptor') {
+  constructor (input = 'Arturia BeatStep:Arturia BeatStep MIDI 1 20:0') {
     this.input = new Input(input)
-    this.input_out = new Output(input)
-    this.output = new Output(output, true)
+    this.out = new Output(input)
 
     // passthrough event stuff
-    this.send = this.output.send.bind(this.output)
+    this.send = this.out.send.bind(this.out)
     this.on = this.input.on.bind(this.input)
 
     // makes auto-resolutions for getter/setters work
@@ -143,11 +142,11 @@ export class BeatStep {
   }
 
   setParameter (cc, vv, pp = 0x50) {
-    this.input_out.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x0, 0x00, pp, cc, vv, 0xF7])
+    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x0, 0x00, pp, cc, vv, 0xF7])
   }
 
   getParameter (cc, pp = 0x50) {
-    this.input_out.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x0, 0x00, pp, cc, 0xF7])
+    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x0, 0x00, pp, cc, 0xF7])
   }
 
   // global getter/setters
