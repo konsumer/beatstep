@@ -73,7 +73,7 @@ These are params that chnage how the controller works, on a global-scale.
 
 #### `gate`
 
-#### `lagato`
+#### `legato`
 
 #### `cvChannel`
 

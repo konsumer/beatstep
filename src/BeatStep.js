@@ -185,7 +185,7 @@ export class BeatStep {
     this.setParameter(0x08, Math.floor(scale(c, 0, 1, 0x00, 0x63)))
   }
 
-  set lagato (c) {
+  set legato (c) {
     this.setParameter(0x09, legatoModes[c.toUpperCase()])
   }
 
