@@ -26,7 +26,7 @@ npx beatstep list
 
 ```bash
 beatstep list       # list MIDI devices
-beatstep seq -i 2   # start sequencer on system's second midi-device
+beatstep seq        # start sequencer on system's most likely midi-device
 ```
 
 ### interaction
@@ -58,13 +58,19 @@ To set it up:
 * turn knob-15 (to set sequence to 1st one)
 * turn knob-16 (to set pattern to 1st one)
 
+make kick drum pattern:
+
 * turn knob-1 (to set channel to 1st one.)
 * turn knob-2 (to set the note to C4)
 * bang out the Kick pattern
 
+make snare pattern:
+
 * turn knob-1 (to set channel to 2nd one.)
 * turn knob-2 (to set the note to C#4)
 * bang out the Snare pattern
+
+make hihat pattern:
 
 * turn knob-1 (to set channel to 3rd one.)
 * turn knob-2 (to set the note to B4)
@@ -81,7 +87,7 @@ Your note/channel mappings & patterns are saved in `~/.beatstep.json`, so you ca
 
 You can also use this as a nice BeatStep interface, in your own code
 
-The class constructor has 1 param, which is the name of input-device, as it appears in `require('easymidi').getInputs()`.
+The class constructor has 2 params, which are the names of input and output device (you can get with `require('easymidi').getInputs()` and `require('easymidi').getOutputs()`.)
 
 The class uses getters & setters to communicate with the controller, so you can very simply tell it to do things, and get values, as if they're just variables. All the getters return Promises.
 
@@ -185,12 +191,16 @@ PLAY
 
 #### LED colors
 
-You can only control red LEDs (even though it also has blue.) Also, the pad needs to be in `NOTE` mode to respond.
+It's totally possible to control LEDs, but there are a few caveats.
+
+You can only control red LEDs (even though the device also has blue.) Also, the pad needs to be in `NOTE` mode to respond.
 
 ```js
 // setup
 beatstep.PAD1.channel = 1
 beatstep.PAD1.mode = 'NOTE'
+beatstep.PAD1.note = 60 // C4
+beatstep.PAD1.behavior = 'GATE'
 
 // turn on LED
 beatstep.PAD1.LED = true

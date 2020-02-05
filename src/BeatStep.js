@@ -86,18 +86,37 @@ export const legatoModes = {
   RESET: 0x02
 }
 
+export const controllerModes = {
+  MMC: 0x07,
+  CC: 0x08,
+  SILENT: 0x01,
+  NOTE: 0x09,
+  PROGRAM: 0x0B
+}
+
+export const controllerBehaviors = {
+  TOGGLE: 0x00,
+  GATE: 0x01
+}
+
 const DEBUG = true
 
+const hex = n => `0x${n.toString(16).padStart(2, '0').toUpperCase()}`
+
 export class Controller {
-  constructor (name, num, input) {
-    this.output = new Output(input)
+  constructor (name, output) {
+    this.output = output
     this.name = name
-    this.num = num
+    this.num = controllers[name]
     this.send = this.output.send.bind(this.output)
+    this.noteNum = this.num
   }
 
   // defaults to pp setting for whole controller (0x01), vs 0x02-0x06 (which desktop software does)
   setParameter (vv, pp = 0x01) {
+    if (DEBUG) {
+      console.log(this.name, { cc: hex(this.num), vv: hex(vv), pp: hex(pp) })
+    }
     this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x02, 0x00, pp, this.num, vv, 0xF7])
   }
 
@@ -106,21 +125,30 @@ export class Controller {
   }
 
   set LED (on) {
-    if (DEBUG) {
-      console.log('LED', this.name, this.num, on)
-    }
-    if (on) {
-      this.setParameter(10, 0x10)
-    } else {
-      this.setParameter(10, 0x00)
-    }
+    this.send('noteon', { note: this.noteNum, velocity: on ? 0x7F : 0x00 })
+  }
+
+  set channel (c) {
+    this.setParameter(c, 0x02)
+  }
+
+  set note (c) {
+    this.setParameter(c, 0x03)
+  }
+
+  set mode (c) {
+    this.setParameter(controllerModes[c.toUpperCase()], 0x01)
+  }
+
+  set behavior (c) {
+    this.setParameter(controllerBehaviors[c.toUpperCase()], 0x06)
   }
 }
 
 export class BeatStep {
-  constructor (input = 'Arturia BeatStep:Arturia BeatStep MIDI 1 20:0') {
+  constructor (input, output) {
     this.input = new Input(input)
-    this.out = new Output(input)
+    this.out = new Output(output)
 
     // passthrough event stuff
     this.send = this.out.send.bind(this.out)
@@ -129,19 +157,16 @@ export class BeatStep {
     // makes auto-resolutions for getter/setters work
     this.controllers = {}
     Object.keys(controllers).forEach((c, i) => {
-      this[c] = new Controller(c, controllers[c], input)
+      this[c] = new Controller(c, this.out)
     })
 
-    // allow user to reference possible values for things
-    this.scales = Object.keys(scales)
-    this.modes = Object.keys(seqmodes)
-    this.stepSizes = Object.keys(stepSizes)
-    this.knobAccelerationModes = Object.keys(knobAccelerationModes)
-    this.padVelocityModes = Object.keys(padVelocityModes)
-    this.legatoModes = Object.keys(legatoModes)
+    this.preset = 0
   }
 
   setParameter (cc, vv, pp = 0x50) {
+    if (DEBUG) {
+      console.log('GLOBAL', { cc: hex(this.num), vv: hex(vv), pp: hex(pp) })
+    }
     this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x0, 0x00, pp, cc, vv, 0xF7])
   }
 
@@ -150,6 +175,14 @@ export class BeatStep {
   }
 
   // global getter/setters
+
+  set preset (c) {
+    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x06, c, 0xF7])
+  }
+
+  recall (c) {
+    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x05, c, 0xF7])
+  }
 
   set channel (c) {
     this.setParameter(0x01, c)

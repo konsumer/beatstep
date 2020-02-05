@@ -1,16 +1,22 @@
-import { getInputs } from 'easymidi'
+import { getInputs, getOutputs } from 'easymidi'
 import yargs from 'yargs'
 
 import sequencer from './sequencer'
 
-const devices = getInputs()
+const inputs = getInputs()
+const outputs = getOutputs()
 
 yargs
   .command('list', 'List MIDI devices',
     y => {},
     args => {
-      devices.forEach((d, i) => {
-        console.log(i + 1, d)
+      console.log('INPUTS:')
+      inputs.forEach((d, i) => {
+        console.log(`  ${i + 1}: ${d}`)
+      })
+      console.log('OUTPUTS:')
+      outputs.forEach((d, i) => {
+        console.log(`  ${i + 1}: ${d}`)
       })
     }
   )
@@ -20,15 +26,21 @@ yargs
         alias: 'i',
         description: 'MIDI input ID number (use `beatstep list`)',
         type: 'number',
-        default: devices.indexOf(devices.find(d => d.includes('Arturia BeatStep'))) + 1
+        default: inputs.indexOf(inputs.find(d => d.includes('Arturia BeatStep'))) + 1
       })
       .option('output', {
         alias: 'o',
-        description: 'Name for MIDI virtual output device',
-        type: 'string',
-        default: 'BeatStep interceptor'
+        description: 'MIDI input ID number (use `beatstep list`)',
+        type: 'number',
+        default: outputs.indexOf(outputs.find(d => d.includes('Arturia BeatStep'))) + 1
       })
-  }, ({ input, output }) => {
-    sequencer(devices[input - 1], output)
+      .option('name', {
+        alias: 'n',
+        description: 'Name for the virtual-device',
+        type: 'string',
+        default: 'Extended BeatStep'
+      })
+  }, ({ input, output, name }) => {
+    sequencer(inputs[input - 1], outputs[output - 1], name)
   })
   .argv
