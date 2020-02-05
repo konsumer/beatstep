@@ -34,7 +34,7 @@ import { getInputs } from 'easymidi'
 const beatstep = new BeatStep(getInputs().find(d => d.includes('Arturia BeatStep')))
 ```
 
-The first param is the name of input-device, as it appears in `require('easymidi').getInputs()`.
+The class has 1 param is the name of input-device, as it appears in `require('easymidi').getInputs()`.
 
 The class uses getters & setters to communicate with the controller, so you can very simply tell it to do things, and get values, as if they're just variables. All the getters return Promises:
 
