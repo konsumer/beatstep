@@ -1,6 +1,6 @@
 # BeatStep Interceptor
 
-This is a command-line program to make the Arturia BeatStep work in differnt ways than the firmware is menat to.
+This is a command-line program to make the Arturia BeatStep work in different ways than the firmware is menat to.
 
 It starts a virtual midi device that can be plugged into other software.
 
