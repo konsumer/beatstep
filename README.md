@@ -20,7 +20,7 @@ npx beatstep list
 
 ```bash
 beatstep list       # list MIDI devices
-beatstep seq -i 1   # start sequencer on device-1
+beatstep seq -i 2   # start sequencer on second midi-device
 ```
 
 ## as a library
