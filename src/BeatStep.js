@@ -1,46 +1,24 @@
 import { Input, Output } from 'easymidi'
 import scale from 'scale-number-range'
+const { isEqual } = require('lodash')
 
-// supported cc controllers
-export const controllers = {
-  ENC1: 0x20,
-  ENC2: 0x21,
-  ENC3: 0x22,
-  ENC4: 0x23,
-  ENC5: 0x24,
-  ENC6: 0x25,
-  ENC7: 0x26,
-  ENC8: 0x27,
-  ENC9: 0x28,
-  ENC10: 0x29,
-  ENC11: 0x2A,
-  ENC12: 0x2B,
-  ENC13: 0x2C,
-  ENC14: 0x2D,
-  ENC15: 0x2E,
-  ENC16: 0x2F,
-
-  PAD1: 0x70,
-  PAD2: 0x71,
-  PAD3: 0x72,
-  PAD4: 0x73,
-  PAD5: 0x74,
-  PAD6: 0x75,
-  PAD7: 0x76,
-  PAD8: 0x77,
-  PAD9: 0x78,
-  PAD10: 0x79,
-  PAD11: 0x7A,
-  PAD12: 0x7B,
-  PAD13: 0x7C,
-  PAD14: 0x7D,
-  PAD15: 0x7E,
-  PAD16: 0x7F,
-
+export const controls = {
   VOLUME: 0x30,
-  STOP: 0x59,
-  PLAY: 0x58
+  STOP: 0x58,
+  PLAY: 0x59,
+  SEQ: 0x5A,
+  SYNC: 0x5B,
+  RECAL: 0x5C,
+  STORE: 0x5D,
+  SHIFT: 0x5E,
+  CHAN: 0x5F
 }
+
+// IDs for encoders
+export const encoders = [...Array(16)].map((v, i) => 0x00 + i)
+
+// IDs for the pads
+export const pads = [...Array(16)].map((v, i) => 0x70 + i)
 
 export const scales = {
   CHROMATIC: 0,
@@ -94,140 +72,85 @@ export const controllerModes = {
   PROGRAM: 0x0B
 }
 
+// named colors
+export const colors = {
+  OFF: 0x00,
+  RED: 0x01,
+  PINK: 0x11,
+  BLUE: 0x10
+}
+
 export const controllerBehaviors = {
   TOGGLE: 0x00,
   GATE: 0x01
 }
 
-const DEBUG = true
+// nicer format for hex
+export const hex = n => `0x${n.toString(16).padStart(2, '0').toUpperCase()}`
 
-const hex = n => `0x${n.toString(16).padStart(2, '0').toUpperCase()}`
-
-export class Controller {
-  constructor (name, output) {
-    this.output = output
-    this.name = name
-    this.num = controllers[name]
-    this.send = this.output.send.bind(this.output)
-    this.noteNum = this.num
-  }
-
-  // defaults to pp setting for whole controller (0x01), vs 0x02-0x06 (which desktop software does)
-  setParameter (vv, pp = 0x01) {
-    if (DEBUG) {
-      console.log(this.name, { cc: hex(this.num), vv: hex(vv), pp: hex(pp) })
-    }
-    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x02, 0x00, pp, this.num, vv, 0xF7])
-  }
-
-  getParamater (pp = 0x01) {
-    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x02, 0x00, pp, this.num, 0xF7])
-  }
-
-  set channel (c) {
-    this.setParameter(c, 0x02)
-  }
-
-  set note (c) {
-    this.setParameter(c, 0x03)
-  }
-
-  set mode (c) {
-    this.setParameter(controllerModes[c.toUpperCase()], 0x01)
-  }
-
-  set behavior (c) {
-    this.setParameter(controllerBehaviors[c.toUpperCase()], 0x06)
-  }
-}
+// wait for time (sec), returns promise
+export const sleep = (time) => new Promise((resolve) => {
+  setTimeout(resolve, time * 1000)
+})
 
 export class BeatStep {
   constructor (input, output) {
     this.input = new Input(input)
-    this.out = new Output(output)
+    this.output = new Output(output)
 
-    // passthrough event stuff
-    this.send = this.out.send.bind(this.out)
     this.on = this.input.on.bind(this.input)
+    this.removeListener = this.input.removeListener.bind(this.input)
+    this.send = this.output.send.bind(this.output)
+  }
 
-    // makes auto-resolutions for getter/setters work
-    this.controllers = {}
-    Object.keys(controllers).forEach((c, i) => {
-      this[c] = new Controller(c, this.out)
+  close () {
+    this.input.close()
+    this.output.close()
+  }
+
+  // get a beatstep param.
+  get (pp, cc) {
+    return new Promise((resolve, reject) => {
+      const getSysex = params => {
+        if (isEqual(params.bytes.slice(0, 10), [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x02, 0x00, pp, cc])) {
+          this.removeListener('sysex', getSysex)
+          sleep(0)
+            .then(() => resolve(params.bytes[10]))
+        }
+      }
+      this.on('sysex', getSysex)
+      this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x01, 0x00, pp, cc, 0xF7])
     })
-
-    this.preset = 0
   }
 
-  setParameter (cc, vv, pp = 0x50) {
-    if (DEBUG) {
-      console.log('GLOBAL', { cc: hex(this.num), vv: hex(vv), pp: hex(pp) })
-    }
-    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x0, 0x00, pp, cc, vv, 0xF7])
+  // set a beatstep param. sleep(0) helps beatstep keep up
+  async set (pp, cc, vv) {
+    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x02, 0x00, pp, cc, vv, 0xF7])
+    await sleep(0)
   }
 
-  getParameter (cc, pp = 0x50) {
-    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x0, 0x00, pp, cc, 0xF7])
+  // set the color of the pad
+  color (pad, color) {
+    return this.set(0x10, pad, colors[color.toUpperCase()])
   }
 
-  // global getter/setters
-
-  set preset (c) {
-    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x06, c, 0xF7])
+  // set the mode of the control
+  mode (control, mode) {
+    return this.set(0x01, control, controllerModes[mode.toUpperCase()])
   }
 
-  recall (c) {
-    this.send('sysex', [0xF0, 0x00, 0x20, 0x6B, 0x7F, 0x42, 0x05, c, 0xF7])
+  // set the channel a note-control sends
+  noteChannel (control, channel) {
+    return this.set(0x02, control, channel)
   }
 
-  set channel (c) {
-    this.setParameter(0x01, c)
+  // set the note a note-control sends
+  note (control, note) {
+    return this.set(0x03, control, note)
   }
 
-  set transpose (c) {
-    this.setParameter(0x02, c)
-  }
-
-  set scale (c) {
-    this.setParameter(0x03, scales[c.toUpperCase().replace(' ', '_')])
-  }
-
-  set seqmode (c) {
-    this.setParameter(0x04, seqmodes[c.toUpperCase()])
-  }
-
-  set step (c) {
-    this.setParameter(0x05, stepSizes[c])
-  }
-
-  set patternLength (c) {
-    this.setParameter(0x06, c)
-  }
-
-  set swing (c) {
-    // 0-1 = 0x32-0x4B
-    this.setParameter(0x07, Math.floor(scale(c, 0, 1, 0x32, 0x4B)))
-  }
-
-  set gate (c) {
-    // 0-1 = 0x00-0x63
-    this.setParameter(0x08, Math.floor(scale(c, 0, 1, 0x00, 0x63)))
-  }
-
-  set legato (c) {
-    this.setParameter(0x09, legatoModes[c.toUpperCase()])
-  }
-
-  set cvChannel (c) {
-    this.setParameter(0x0C, c)
-  }
-
-  set paddVelocityCurve (c) {
-    this.setParameter(0x03, padVelocityModes[c.toUpperCase()], 0x41)
-  }
-
-  set knobAcceleration (c) {
-    this.setParameter(0x04, knobAccelerationModes[c.toUpperCase()], 0x41)
+  noteMode (control, mode) {
+    return this.set(0x06, control, controllerBehaviors[mode.toUpperCase()])
   }
 }
 
