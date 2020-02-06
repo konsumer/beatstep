@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@zeit/ncc": "^0.21.0",
-    "esm": "^3.2.25"
+    "esm": "^3.2.25",
+    "lodash": "^4.17.15"
   }
 }
