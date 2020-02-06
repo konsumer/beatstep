@@ -1,6 +1,6 @@
 // this is for testing LED stuff
 
-const { output, set, sleep, pads, colors } = require('./utils')
+const { close, set, sleep, pads, colors } = require('./utils')
 
 const run = async () => {
   for (const p in pads) {
@@ -26,6 +26,6 @@ const run = async () => {
     await set(0x10, pads[p], colors.off)
   }
 
-  output.close()
+  close()
 }
 run()
