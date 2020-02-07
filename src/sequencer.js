@@ -42,20 +42,20 @@ export const sequencer = async (input, output, name) => {
   beatstep.on('reset', handler)
   beatstep.on('sysex', params => console.log({ type: params._type, bytes: params.bytes.map(hex) }))
 
-  // test global channel
-  console.log('global channel', await beatstep.get(0x50, 0x0B))
-
   beatstep.on('noteoff', async params => {
     if (params.channel === 0x02) { // left controller button
-      // channel is "track"
+      // scale is sequence-bank
+      if (params.note === controls.SHIFT) {
+        console.log('sequence bank', hex(await beatstep.get(0x50, 0x03)))
+      }
+
+      // global midi channel is track
+      // TODO: this always returns 0x15
       if (params.note === controls.CHAN) {
-        // hmm, this should grab global channel that was just selected, but it always returns 0x15
         console.log('channel', hex(await beatstep.get(0x50, 0x0B)))
       }
     }
   })
-
-  // TODO: disable real sequencer and run my own
 }
 
 export default sequencer
