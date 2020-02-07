@@ -8,9 +8,16 @@ export const sequencer = async (input, output, name) => {
 
   // set initial state of controller
   for (const p in pads) {
-    await beatstep.mode(pads[p], 'PROGRAM')
-    await beatstep.note(pads[p], 0x70 + p)
+    await beatstep.mode(pads[p], 'NOTE')
     await beatstep.noteChannel(pads[p], 0x01)
+    await beatstep.note(pads[p], 0x70 + p)
+  }
+
+  const controlsv = Object.values(controls)
+  for (const c in controlsv) {
+    await beatstep.mode(controlsv[c], 'NOTE')
+    await beatstep.noteChannel(controlsv[c], 0x02)
+    await beatstep.note(controlsv[c], controlsv[c])
   }
 
   const handler = ({ _type, ...params }) => {
@@ -33,38 +40,18 @@ export const sequencer = async (input, output, name) => {
   beatstep.on('select', handler)
   beatstep.on('stop', handler)
   beatstep.on('reset', handler)
-  // beatstep.on('sysex', params => console.log({ type: params._type, bytes: params.bytes.map(hex) }))
+  beatstep.on('sysex', params => console.log({ type: params._type, bytes: params.bytes.map(hex) }))
 
-  // usage
-  // shift-options sets current pattern: 16 tracks, 4x4 sequences
-
-  const displaySequence = async () => {
-    for (const p in pads) {
-      await beatstep.color(pads[p], sequence[seqa][seqb][seqc][p] ? 'BLUE' : 'OFF')
-      await sleep(0)
-    }
-  }
-
-  await beatstep.mode(controls.SHIFT, 'NOTE')
-  await beatstep.noteChannel(controls.SHIFT, 0x02)
-  await beatstep.note(controls.SHIFT, 0x01)
-
-  const sequence = [...Array(4)].map(() => [...Array(4)].map(() => [...Array(16)].map(() => [...Array(16)].fill(0))))
-  let seqa = await beatstep.get(0x50, 0x03) // scale
-  let seqb = await beatstep.get(0x50, 0x04) // mode
-  let seqc = await beatstep.get(0x50, 0x05) // step
-
-  // test beat
-  sequence[0][0][0] = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]
-
-  await displaySequence()
+  // test global channel
+  console.log('global channel', await beatstep.get(0x50, 0x0B))
 
   beatstep.on('noteoff', async params => {
-    if (params.channel === 0x02 && params.note === 0x01) { // shift
-      seqa = await beatstep.get(0x50, 0x03) // scale
-      seqb = await beatstep.get(0x50, 0x04) // mode
-      seqc = await beatstep.get(0x50, 0x05) // step
-      await displaySequence()
+    if (params.channel === 0x02) { // left controller button
+      // channel is "track"
+      if (params.note === controls.CHAN) {
+        // hmm, this should grab global channel that was just selected, but it always returns 0x15
+        console.log('channel', hex(await beatstep.get(0x50, 0x0B)))
+      }
     }
   })
 

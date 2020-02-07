@@ -31,56 +31,17 @@ beatstep seq        # start sequencer on system's most likely midi-device
 
 ### interaction
 
-```
-rate   : the bpm
-knob-1 : current channel
-knob-2 : channel's note
+My main goal was just to have more simultaneous tracks & more possible sequences.
 
-knob-14: current song
-knob-15: current sequence
-knob-16: current pattern
-```
+* `STOP`/`PLAY` start & stop current pattern
+* Enter `SEQ` mode (`CTRL`/`SEQ` is blue)
+* You can select your current track with `CHAN`, and the current pattern will update.
+* Select your current sequence with scale (`SHIFT` + top-row of pads)
+* Select your current pattern with `RECALL`
+* Save your current pattern with `STORE`
+* Knobs just work as regular CC knobs, on the same channel as pads
 
-A song (1-16) is made of sequences (1-16) and a sequence (1-16) is made of patterns (1-16.) Each pattern has channels (1-16) that play at the same time.
-
-For a beat like this:
-
-```
-        0123456789ABCDEF
-HiHat  |X X X X X X X X | B4
-Snare  |    X       X   | C#4
-Kick   |X   X   X   X   | C4
-```
-
-To set it up:
-
-* turn knob-14 (to set song to 1st one)
-* turn knob-15 (to set sequence to 1st one)
-* turn knob-16 (to set pattern to 1st one)
-
-make kick drum pattern:
-
-* turn knob-1 (to set channel to 1st one.)
-* turn knob-2 (to set the note to C4)
-* bang out the Kick pattern
-
-make snare pattern:
-
-* turn knob-1 (to set channel to 2nd one.)
-* turn knob-2 (to set the note to C#4)
-* bang out the Snare pattern
-
-make hihat pattern:
-
-* turn knob-1 (to set channel to 3rd one.)
-* turn knob-2 (to set the note to B4)
-* bang out the Hihat pattern
-
-After that, change songs (knob-14), patterns (knob-16), and sequences (knob-15), and you can use STOP/PLAY.
-
-It's designed so you can use the last knob to swap out patterns and the 1st knob to set the channel for quick creation of patterns, once you have it all setup.
-
-Your note/channel mappings & patterns are saved in `~/.beatstep.json`, so you can edit the file directly, or delete it to start over.
+This means that we have 8x16 patterns (each with 16 tracks), instead of 16 patterns (with 1 track), by sacrificing scale & live channel-setting, without having to sacrafice too much.
 
 
 ## as a library

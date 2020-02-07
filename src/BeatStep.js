@@ -4,11 +4,11 @@ const { isEqual } = require('lodash')
 
 export const controls = {
   VOLUME: 0x30,
-  STOP: 0x58,
-  PLAY: 0x59,
+  PLAY: 0x58,
+  STOP: 0x59,
   SEQ: 0x5A,
   SYNC: 0x5B,
-  RECAL: 0x5C,
+  RECALL: 0x5C,
   STORE: 0x5D,
   SHIFT: 0x5E,
   CHAN: 0x5F
