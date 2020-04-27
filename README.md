@@ -50,6 +50,12 @@ You can also use this as a nice BeatStep interface, in your own code
 
 The class constructor has 2 params, which are the names of input and output device (you can get with `require('easymidi').getInputs()` and `require('easymidi').getOutputs()`.)
 
+## hardware
+
+Eventually, I'd like to reprogram the chip on the controller to acheive a fully custom sequencer.
+
+It uses a [stm32f103](https://www.st.com/en/microcontrollers-microprocessors/stm32f103.html) chip, with some supporting circuitry to multiplex all the buttons, leds, and knobs. It looks like it has programming pins on board (`JP1`) but firmware updates over sysex would be preferrable. [This](https://medium.com/techmaker/reverse-engineering-stm32-firmware-578d53e79b3) might give me some ideas for reversing the firmware to the point that I can read inputs, output LEDs, and eventually just write my own interface.
+
 
 ### TODO
 
