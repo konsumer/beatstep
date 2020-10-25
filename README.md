@@ -1,4 +1,8 @@
-# BeatStep Interceptor
+# WIP
+
+I haven't really worked out the sequencer fully. I think I know how I want it to work, but haven't written the code to make it work that way. I thkn the lib is still useful as it is, but it will need some more work to be a functional sequencer.
+
+## BeatStep Interceptor
 
 This is a command-line program to make the Arturia BeatStep work in different ways than the firmware is meant to.
 
