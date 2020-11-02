@@ -160,5 +160,3 @@ export class BeatStep {
     return this.set(0x06, control, controllerBehaviors[mode.toUpperCase()])
   }
 }
-
-export default BeatStep

@@ -53,6 +53,7 @@ You can also use this as a nice BeatStep interface, in your own code
 
 The class constructor has 2 params, which are the names of input and output device (you can get with `require('easymidi').getInputs()` and `require('easymidi').getOutputs()`.)
 
+
 ## hardware
 
 Eventually, I'd like to reprogram the chip on the controller to acheive a fully custom sequencer.
