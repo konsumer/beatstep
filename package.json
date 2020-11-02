@@ -1,6 +1,6 @@
 {
   "name": "beatstep",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Intercept beatstep and make it work in different ways",
   "scripts": {
     "start": "node -r esm src/cli.js seq",
