@@ -90,7 +90,7 @@ Ideally, I could compile my own code, create my own led file (appears to be hex)
 * Figure out easier-to-compile MIDI lib (for cross-platform release building)
 * Make sure initial settings are complete in `setup` in case user has controller setup funny
 * Different seqquencer styles: current (all drums in one instrument on one channel), seperate drum instruments, seperate channels, something for melodies
-* Better debug more that prints all midi messages sent and 
+* Better debug more that prints all midi messages sent and received
 
 ## thanks
 
