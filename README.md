@@ -54,6 +54,20 @@ You can also use this as a nice BeatStep interface, in your own code
 The class constructor has 2 params, which are the names of input and output device (you can get with `require('easymidi').getInputs()` and `require('easymidi').getOutputs()`.)
 
 
+```js
+import { getOutputs, getInputs } from 'easymidi'
+import { BeatStep } from 'beatstep`
+
+const beatstep = new BeatStep(
+  getInputs().find(d => d.includes('Arturia BeatStep')),
+  getOutputs().find(d => d.includes('Arturia BeatStep'))
+)
+
+beatstep.on('noteon', console.log)
+beatstep.on('noteoff', console.log)
+
+```
+
 ## hardware
 
 Eventually, I'd like to reprogram the chip on the controller to acheive a fully custom sequencer.
