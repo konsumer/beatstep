@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 
-import { pads, BeatStep, hex, sleep, controls } from './BeatStep'
+import { pads, BeatStep, controls } from './BeatStep'
 import findConfig from 'find-config'
 import { promises as fs } from 'fs'
 
@@ -13,7 +13,6 @@ async function saveSong (song) {
 // load the song
 async function loadSong () {
   const file = findConfig('beatstep-song.json') || `${process.env.HOME}/.config/beatstep-song.json`
-
   try {
     return JSON.parse(await fs.readFile(file))
   } catch (e) {
@@ -45,8 +44,6 @@ export const sequencer = async (input, output, name) => {
   const beatstep = new BeatStep(input, output)
 
   await setup(beatstep)
-
-  // BELOW IS SEQUENCER
 
   let stopPressed = false
   let shiftPressed = false
@@ -110,7 +107,7 @@ export const sequencer = async (input, output, name) => {
         playing = !playing
       }
     } else if (channel === 0x00) {
-      // handle step here
+      // TODO: handle step here
     }
   })
 
@@ -138,7 +135,7 @@ export const sequencer = async (input, output, name) => {
         await saveSong(pattern)
       }
     } else if (channel === 0x00) {
-      // handle step here
+      // TODO: handle step here
     }
   })
 }

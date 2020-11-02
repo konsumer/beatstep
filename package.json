@@ -29,13 +29,13 @@
   "dependencies": {
     "chalk": "^3.0.0",
     "easymidi": "^1.0.3",
+    "esm": "^3.2.25",
     "find-config": "^1.0.0",
     "lodash": "^4.17.20",
     "scale-number-range": "^1.0.3",
     "yargs": "^16.1.0"
   },
   "devDependencies": {
-    "esm": "^3.2.25",
     "microbundle": "^0.12.4",
     "pkg": "^4.4.9"
   },

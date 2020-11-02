@@ -1,5 +1,4 @@
 import { Input, Output } from 'easymidi'
-import scale from 'scale-number-range'
 const { isEqual } = require('lodash')
 
 export const controls = {
