@@ -78,7 +78,13 @@ It uses a [stm32f103](https://www.st.com/en/microcontrollers-microprocessors/stm
 
 ### TODO
 
-Fill in the docs: api & docs.
+* Fill in the docs: api & docs.
+* Figure out `RATE` knob for BPM
+* Figure out `CHAN` so I can use that to switch tracks and use `SHIFT` to do something else (commands like copy/paste and sequencer controls would be cool)
+* Passthrough (and optionally silence) when pads are initally hit
+* passthrough CCs
+* Figure out easier-to-compile MIDI lib (for cross-platform release building)
+* Make sure initial settings are complete in `setup` in case user has controller setup funny
 
 ## thanks
 
