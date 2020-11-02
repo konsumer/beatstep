@@ -1,8 +1,9 @@
 import chalk from 'chalk'
 
-import { pads, BeatStep, controls } from './BeatStep'
+import { pads, BeatStep, controls, hex } from './BeatStep'
 import findConfig from 'find-config'
 import { promises as fs } from 'fs'
+import easymidi from 'easymidi'
 
 // save the song
 async function saveSong (song) {
@@ -28,6 +29,9 @@ async function setup (beatstep) {
     await beatstep.mode(pads[p], 'NOTE')
     await beatstep.noteChannel(pads[p], 0x01)
     await beatstep.note(pads[p], 0x70 + p)
+
+    // this makes play stop working (so I can control it)
+    await beatstep.set(0x50, p, 0x01)
   }
 
   // TODO: is it possible to bind the level/rate knob?
@@ -39,9 +43,11 @@ async function setup (beatstep) {
   }
 }
 
-export const sequencer = async (input, output, name) => {
+export const sequencer = async (input, output, name, channel) => {
   console.log(chalk.green('Press Ctrl-C to quit.'))
   const beatstep = new BeatStep(input, output)
+
+  const voutput = new easymidi.Output(name, true)
 
   await setup(beatstep)
 
@@ -50,7 +56,7 @@ export const sequencer = async (input, output, name) => {
   let currentPattern = 0
   let currentTrack = 0
   let playing = false
-  let step = 0
+  let step = 4
 
   // TODO: figure out CHAN as I can track up/down for CHAN button, but not which channel was selected
   // TODO: send initial stop command?
@@ -60,8 +66,9 @@ export const sequencer = async (input, output, name) => {
 
   // show current pattern
   async function showCurrentPattern () {
+    await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
     for (const p in pads) {
-      await beatstep.color(pads[p], pattern[currentPattern][currentTrack][p] ? 'red' : 'off')
+      await beatstep.color(pads[p], pattern[currentPattern][currentTrack][p] ? (p == step && playing ? 'pink' : 'red') : (p == step && playing ? 'blue' : 'off'))
     }
   }
 
@@ -95,9 +102,8 @@ export const sequencer = async (input, output, name) => {
     if (channel === 0x02) {
       if (note === controls.STOP) {
         stopPressed = true
-        playing = false
-        step = 0
         await showTrackSelect()
+        await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
       }
       if (note === controls.SHIFT) {
         shiftPressed = true
@@ -105,9 +111,9 @@ export const sequencer = async (input, output, name) => {
       }
       if (note === controls.PLAY) {
         playing = !playing
+        step = 0
+        await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
       }
-    } else if (channel === 0x00) {
-      // TODO: handle step here
     }
   })
 
@@ -115,10 +121,13 @@ export const sequencer = async (input, output, name) => {
     if (channel === 0x02) {
       if (note === controls.STOP) {
         stopPressed = false
-        playing = false
+        await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
       }
       if (note === controls.SHIFT) {
         shiftPressed = false
+      }
+      if (note === controls.PLAY) {
+        await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
       }
       await showCurrentPattern()
     } else if (channel === 0x01) {
@@ -134,10 +143,23 @@ export const sequencer = async (input, output, name) => {
         await showCurrentPattern()
         await saveSong(pattern)
       }
-    } else if (channel === 0x00) {
-      // TODO: handle step here
     }
   })
+
+  setInterval(() => {
+    if (playing) {
+      beatstep.color(pads[step], pattern[currentPattern][currentTrack][step] ? 'red' : 'off')
+      step = (step + 1) % 16
+      showCurrentPattern()
+      for (const t in pattern[currentPattern]) {
+        if (pattern[currentPattern][t][step]) {
+          voutput.send('noteon', { channel, note: 48 + parseInt(t), velocity: 0x7F })
+        } else {
+          voutput.send('noteoff', { channel, note: 48 + parseInt(t), velocity: 0x00 })
+        }
+      }
+    }
+  }, 125)
 }
 
 export default sequencer

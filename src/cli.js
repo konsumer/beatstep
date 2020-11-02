@@ -46,9 +46,9 @@ yargs
       .option('channel', {
         alias: 'c',
         description: 'The channel to send notes & CCs on',
-        default: 10
+        default: 0
       })
-  }, ({ input, output, name }) => {
-    sequencer(inputs[input - 1], outputs[output - 1], name)
+  }, ({ input, output, name, channel }) => {
+    sequencer(inputs[input - 1], outputs[output - 1], name, channel)
   })
   .argv

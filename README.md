@@ -39,11 +39,10 @@ I am still working on this part. Here is how it currently works:
 
 - all changes to sequencer are saved in ~/.config/beatstep-song.json
 - run `beatstep seq` to start the sequencer
-- Make sure controller is in `CNTRL` mode (red)
+- Make sure controller is in `CNTRL` mode (red) and turn on `EXT SYNC` (blue)
 - Press `SHIFT` to chose pattern
 - Press `STOP` to choose track
-
-I will add play/stop and channel once I work out more details
+- `PLAY` will play/stop the current pattern
 
 
 
