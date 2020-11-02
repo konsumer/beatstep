@@ -12,6 +12,8 @@ It starts a virtual midi device that can be plugged into other software.
 
 > Using the CLI will set your device up with specifc mappings and stuff, so make sure to back up your settings in the desktop program, if you care about them.
 
+[![new beatstep sequencer](http://img.youtube.com/vi/dVYkL6qTRXc/0.jpg)](http://www.youtube.com/watch?v=dVYkL6qTRXc "See it in action")
+
 ## installation
 
 ```bash
