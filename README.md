@@ -71,20 +71,26 @@ beatstep.on('noteoff', console.log)
 
 ## hardware
 
-Eventually, I'd like to reprogram the chip on the controller to acheive a fully custom sequencer.
+Eventually, I'd like to reprogram the chip on the controller to acheive a fully custom standalone sequencer.
 
 It uses a [stm32f103](https://www.st.com/en/microcontrollers-microprocessors/stm32f103.html) chip, with some supporting circuitry to multiplex all the buttons, leds, and knobs. It looks like they are using [hc574](https://www.ti.com/lit/ds/symlink/sn54hc574.pdf?ts=1587965539932) to multiplex rotoary-encoders, somehow. It looks like it has programming pins on board (`JP1`) but firmware updates over sysex would be preferrable. [This](https://medium.com/techmaker/reverse-engineering-stm32-firmware-578d53e79b3) might give me some ideas for reversing the firmware to the point that I can read inputs, output LEDs, and eventually just write my own interface.
+
+Ideally, I could compile my own code, create my own led file (appears to be hex) and send over sysex.
 
 
 ### TODO
 
 * Fill in the docs: api & docs.
+* Reverse `.beatstep` format (it's a JSON file) for presets, so linux can use them and it's easier to manage on mac/windows
 * Figure out `RATE` knob for BPM
 * Figure out `CHAN` so I can use that to switch tracks and use `SHIFT` to do something else (commands like copy/paste and sequencer controls would be cool)
+* Use `STORE`/`RECALL` for somethign other than intended. Would be good to fire save/load (maybe combined with `SHIFT` and `STOP` for track/pattern/song)
 * Passthrough (and optionally silence) when pads are initally hit
 * passthrough CCs
 * Figure out easier-to-compile MIDI lib (for cross-platform release building)
 * Make sure initial settings are complete in `setup` in case user has controller setup funny
+* Different seqquencer styles: current (all drums in one instrument on one channel), seperate drum instruments, seperate channels, something for melodies
+* Better debug more that prints all midi messages sent and 
 
 ## thanks
 
