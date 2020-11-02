@@ -42,6 +42,7 @@
   "files": [
     "dist/BeatStep.js",
     "dist/BeatStep.module.js",
-    "dist/BeatStep.umd.js"
+    "dist/BeatStep.umd.js",
+    "src/sequencer.js"
   ]
 }
