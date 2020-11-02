@@ -2,15 +2,19 @@
   "name": "beatstep",
   "version": "0.0.0",
   "description": "Intercept beatstep and make it work in different ways",
-  "main": "./dist/BeatStep.js",
-  "exports": "./src/BeatStep.js",
   "scripts": {
-    "start": "node -r esm src/index.js seq",
-    "build": "ncc src/index.js"
+    "start": "node -r esm src/cli.js seq",
+    "build:cli": "pkg src/cli.js",
+    "build:lib": "microbundle",
+    "prepublishOnly": "npm run build:lib"
   },
   "bin": {
-    "beatstep": "dist/index.js"
+    "beatstep": "src/cli.js"
   },
+  "source": "src/BeatStep.js",
+  "main": "dist/BeatStep.js",
+  "module": "dist/BeatStep.module.js",
+  "unpkg": "dist/BeatStep.umd.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/konsumer/beatstep.git"
@@ -25,12 +29,19 @@
   "dependencies": {
     "chalk": "^3.0.0",
     "easymidi": "^1.0.3",
+    "find-config": "^1.0.0",
+    "lodash": "^4.17.20",
     "scale-number-range": "^1.0.3",
-    "yargs": "^15.1.0"
+    "yargs": "^16.1.0"
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.21.0",
     "esm": "^3.2.25",
-    "lodash": "^4.17.15"
-  }
+    "microbundle": "^0.12.4",
+    "pkg": "^4.4.9"
+  },
+  "files": [
+    "dist/BeatStep.js",
+    "dist/BeatStep.module.js",
+    "dist/BeatStep.umd.js"
+  ]
 }

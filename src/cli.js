@@ -1,3 +1,6 @@
+#!/bin/sh
+':' // ;exec "$(command -v node || command -v nodejs)" -r esm $0 $*
+
 import { getInputs, getOutputs } from 'easymidi'
 import yargs from 'yargs'
 

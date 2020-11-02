@@ -31,17 +31,16 @@ beatstep seq        # start sequencer on system's most likely midi-device
 
 ### interaction
 
-My main goal was just to have more simultaneous tracks & more possible sequences.
+I am still working on this part. Here is how it currently works:
 
-* `STOP`/`PLAY` start & stop current pattern
-* Enter `SEQ` mode (`CTRL`/`SEQ` is blue)
-* You can select your current track with `CHAN`, and the current pattern will update.
-* Select your current sequence with scale (`SHIFT` + top-row of pads)
-* Select your current pattern with `RECALL`
-* Save your current pattern with `STORE`
-* Knobs just work as regular CC knobs, on the same channel as pads
+- all changes to sequencer are saved in ~/.config/beatstep-song.json
+- run `beatstep seq` to start the sequencer
+- Make sure controller is in `CNTRL` mode (red)
+- Press `SHIFT` to chose pattern
+- Press `STOP` to choose track
 
-This means that we have 8x16 patterns (each with 16 tracks), instead of 16 patterns (with 1 track), by sacrificing scale & live channel-setting, without having to sacrafice too much.
+I will add play/stop and channel once I work out more details
+
 
 
 ## as a library

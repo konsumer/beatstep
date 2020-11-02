@@ -95,17 +95,25 @@ export const sleep = (time) => new Promise((resolve) => {
 
 export class BeatStep {
   constructor (input, output) {
-    this.input = new Input(input)
-    this.output = new Output(output)
-
-    this.on = this.input.on.bind(this.input)
-    this.removeListener = this.input.removeListener.bind(this.input)
-    this.send = this.output.send.bind(this.output)
+    if (input) {
+      this.input = new Input(input)
+      this.on = this.input.on.bind(this.input)
+      this.removeListener = this.input.removeListener.bind(this.input)
+    } else {
+      this.on = () => console.error('Please set your input in the BeatStep constructor.')
+      this.removeListener = () => console.error('Please set your input in the BeatStep constructor.')
+    }
+    if (output) {
+      this.output = new Output(output)
+      this.send = this.output.send.bind(this.output)
+    } else {
+      this.send = () => console.error('Please set your output in the BeatStep constructor.')
+    }
   }
 
   close () {
-    this.input.close()
-    this.output.close()
+    this.input && this.input.close()
+    this.output && this.output.close()
   }
 
   // get a beatstep param.
