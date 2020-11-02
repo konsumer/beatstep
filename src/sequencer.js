@@ -7,16 +7,18 @@ import { promises as fs } from 'fs'
 // save the song
 async function saveSong (song) {
   const file = findConfig('beatstep-song.json') || `${process.env.HOME}/.config/beatstep-song.json`
+  await fs.writeFile(file, JSON.stringify(song, null, 2))
 }
 
 // load the song
 async function loadSong () {
   const file = findConfig('beatstep-song.json') || `${process.env.HOME}/.config/beatstep-song.json`
 
-  console.log('FILE', file)
-
-  // create empty song
-  return [...new Array(16)].map(() => [...new Array(16)].map(() => (new Array(16)).fill(false)))
+  try {
+    return JSON.parse(await fs.readFile(file))
+  } catch (e) {
+    return [...new Array(16)].map(() => [...new Array(16)].map(() => (new Array(16)).fill(false)))
+  }
 }
 
 // set initial state of controller
@@ -133,6 +135,7 @@ export const sequencer = async (input, output, name) => {
         const s = padToNumber(note)
         pattern[currentPattern][currentTrack][s] = !pattern[currentPattern][currentTrack][s]
         await showCurrentPattern()
+        await saveSong(pattern)
       }
     } else if (channel === 0x00) {
       // handle step here
