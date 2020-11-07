@@ -16,27 +16,27 @@ yargs
   .command('load <file>', 'Load a .beatstep preset file',
     y => {
       y
-      .option('output', {
-        alias: 'o',
-        description: 'MIDI input ID number (use `beatstep list`)',
-        type: 'number',
-        default: outputs.indexOf(outputs.find(d => d.includes('Arturia BeatStep'))) + 1
-      })
+        .option('output', {
+          alias: 'o',
+          description: 'MIDI input ID number (use `beatstep list`)',
+          type: 'number',
+          default: outputs.indexOf(outputs.find(d => d.includes('Arturia BeatStep'))) + 1
+        })
     },
     async ({ output, file }) => {
       const beatstep = new BeatStep(undefined, outputs[output - 1])
-      await beatstep.setPresets( JSON.parse(await fs.readFile(file)) )
+      await beatstep.setPresets(JSON.parse(await fs.readFile(file)))
     }
   )
   .command('save <file>', 'Save a .beatstep preset file',
     y => {
       y
-      .option('input', {
-        alias: 'i',
-        description: 'MIDI input ID number (use `beatstep list`)',
-        type: 'number',
-        default: inputs.indexOf(inputs.find(d => d.includes('Arturia BeatStep'))) + 1
-      })
+        .option('input', {
+          alias: 'i',
+          description: 'MIDI input ID number (use `beatstep list`)',
+          type: 'number',
+          default: inputs.indexOf(inputs.find(d => d.includes('Arturia BeatStep'))) + 1
+        })
     },
     async ({ input, file }) => {
       const beatstep = new BeatStep(inputs[input - 1])
@@ -86,7 +86,7 @@ yargs
         description: 'The filename of the song to use',
         default: findConfig('beatstep-song.json') || `${process.env.HOME}/.config/beatstep-song.json`
       })
-  }, ({ input, output, name, channel, song}) => {
+  }, ({ input, output, name, channel, song }) => {
     sequencer(inputs[input - 1], outputs[output - 1], name, channel, song)
   })
   .demandCommand()

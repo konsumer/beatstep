@@ -162,7 +162,7 @@ export class BeatStep {
 
   // output a .beatstep file object
   getPresets () {
-    const out = { "device": "BeatStep" }
+    const out = { device: 'BeatStep' }
     return out
   }
 

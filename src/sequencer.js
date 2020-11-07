@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import { promises as fs } from 'fs'
 import easymidi from 'easymidi'
 
-import { BeatStep, pads, controls, hex } from './BeatStep'
+import { BeatStep, pads, controls } from './BeatStep'
 import setup from './setup'
 
 // save the song
@@ -35,17 +35,17 @@ export const sequencer = async (input, output, name, channel, song) => {
   let bpm = 120
 
   const showTrack = async () => {
-    for (const p in  pads) {
+    for (const p in pads) {
       await beatstep.color(pads[p], p == currentTrack ? 'blue' : 'off')
     }
   }
-  
+
   const showPattern = async () => {
-    for (const p in  pads) {
+    for (const p in pads) {
       await beatstep.color(pads[p], p == currentPattern ? 'blue' : 'off')
     }
   }
-  
+
   const showCurrent = async () => {
     await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
     for (const p in pads) {
@@ -69,11 +69,11 @@ export const sequencer = async (input, output, name, channel, song) => {
       }
     } else {
       if (!pressedStop && !pressedShift) {
-        pattern[currentPattern][currentTrack][ note - 0x24 ] = ! pattern[currentPattern][currentTrack][ note - 0x24 ]
-        if (pattern[currentPattern][currentTrack][ note - 0x24 ]){
+        pattern[currentPattern][currentTrack][note - 0x24] = !pattern[currentPattern][currentTrack][note - 0x24]
+        if (pattern[currentPattern][currentTrack][note - 0x24]) {
           voutput.send('noteon', { channel, note: currentTrack + 0x24, velocity })
         }
-        await saveSong (pattern, song)
+        await saveSong(pattern, song)
         await showCurrent()
       } else {
         if (pressedStop) {
@@ -87,7 +87,7 @@ export const sequencer = async (input, output, name, channel, song) => {
       }
     }
   })
-  
+
   beatstep.on('noteoff', async ({ channel, note, velocity }) => {
     if (channel === 0x0F) {
       if (note === 0x00) {
@@ -100,7 +100,7 @@ export const sequencer = async (input, output, name, channel, song) => {
       }
     } else {
       if (!pressedStop && !pressedShift) {
-        if (pattern[currentPattern][currentTrack][ note - 0x24 ]){
+        if (pattern[currentPattern][currentTrack][note - 0x24]) {
           voutput.send('noteoff', { channel, note: currentTrack + 0x24, velocity })
         }
         await showCurrent()
@@ -110,7 +110,7 @@ export const sequencer = async (input, output, name, channel, song) => {
 
   // handle rate knob
   beatstep.on('cc', ({ channel, controller, value }) => {
-    if (channel === 0x00 && controller === 0x10){
+    if (channel === 0x00 && controller === 0x10) {
       bpm = (value * 4) + 10
       console.log(chalk.blue('BPM'), chalk.yellow(bpm))
     }
@@ -136,7 +136,7 @@ export const sequencer = async (input, output, name, channel, song) => {
   await showCurrent()
 
   // this gets run once every sequencer beat
-  function tick() {
+  function tick () {
     setTimeout(tick, 1000 * 60 / bpm)
     if (playing) {
       for (const t in pattern[currentPattern]) {
@@ -150,7 +150,7 @@ export const sequencer = async (input, output, name, channel, song) => {
       showCurrent()
     }
   }
-  
+
   tick()
 }
 
