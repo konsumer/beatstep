@@ -1,6 +1,6 @@
-import { promises as fs } from 'fs'
 import { controls } from './BeatStep'
 
+// this is an inlined .beatstep file
 const settings = {
   device: 'BeatStep',
   '0_82': 60,
