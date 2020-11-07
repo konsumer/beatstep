@@ -168,11 +168,11 @@ export class BeatStep {
   // apply a .beatstep file object
   async setPresets (settings) {
     const { device, ...params } = settings
-    await Promise.all(Object.keys(params).map(async p => {
-      const [pp, cc] = p.split('_').map(n => parseInt(n))
+    for (const p of Object.keys(params)) {
+      const [cc, pp] = p.split('_').map(n => parseInt(n))
       const vv = params[p]
       await this.set(pp, cc, vv)
-    }))
+    }
   }
 
   // apply a .led firmware file
