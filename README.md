@@ -12,7 +12,7 @@ The Arturia BeatStep is a really nice-feeling device, that is pretty cheap (~$10
 
 It starts a virtual midi device that can be plugged into other software.
 
-> **IMPORTANT** Using the CLI will set your device up with specifc mappings and stuff, so make sure to back up your beatstep settings in the MIDI Control Center (from Arturia) program, or use `STORE`/`RECALL` if you care about them.
+> **IMPORTANT** Using the sequencer will set your device up with specifc mappings and stuff, so make sure to back up your beatstep settings in the MIDI Control Center (from Arturia) program, or use `STORE`/`RECALL` buttons on device, or use `save`/`load` in CLI, if you care about them.
 
 ## installation
 
@@ -31,22 +31,32 @@ npx beatstep list
 ### command-line
 
 ```bash
-beatstep list       # list MIDI devices
-beatstep seq        # start sequencer on system's most likely midi-device
+beatstep <command>
+
+Commands:
+  beatstep load <file>  Load a .beatstep preset file
+  beatstep save <file>  Save a .beatstep preset file
+  beatstep list         List MIDI devices
+  beatstep seq          Start sequencer
+
+Options:
+  --help     Show help                                                 [boolean]
+  --version  Show version number                                       [boolean]
 ```
+
+Commands have more options. If you want to know more about it, run `beatstep <command> --help`
 
 ### interaction
 
 I am still working on this part. Here is how it currently works:
 
-- all changes to sequencer are saved in ~/.config/beatstep-song.json
 - run `beatstep seq` to start the sequencer
 - Make sure controller is in `CNTRL` mode (red) and turn on `EXT SYNC` (blue)
 - Press `SHIFT` to chose pattern
 - Press `STOP` to choose track
 - `PLAY` will play/stop the current pattern
 
-
+The notes it sends out are based on [hydrogen](http://hydrogen-music.org/) drumkits, which is a common mapping for drumkit-instruments starting at `C1` with a kick drum. Eventually, I can make this a configurable option (like a CLI flag that you can tell it the notes it can use for each track.)
 
 ## as a library
 
@@ -81,14 +91,10 @@ Ideally, I could compile my own code, create my own led file (appears to be hex)
 ### TODO
 
 * Fill in the docs: api & docs.
-* Reverse `.beatstep` format (it's a JSON file) for presets, so linux can use them and it's easier to manage on mac/windows
 * Figure out `RATE` knob for BPM
 * Figure out `CHAN` so I can use that to switch tracks and use `SHIFT` to do something else (commands like copy/paste and sequencer controls would be cool)
-* Use `STORE`/`RECALL` for somethign other than intended. Would be good to fire save/load (maybe combined with `SHIFT` and `STOP` for track/pattern/song)
-* Passthrough (and optionally silence) when pads are initally hit
-* passthrough CCs
+* Use `STORE`/`RECALL` for something other than intended. Would be good to fire save/load (maybe combined with `SHIFT` and `STOP` for track/pattern/song)
 * Figure out easier-to-compile MIDI lib (for cross-platform release building)
-* Make sure initial settings are complete in `setup` in case user has controller setup funny
 * Different seqquencer styles: current (all drums in one instrument on one channel), seperate drum instruments, seperate channels, something for melodies
 * Better debug more that prints all midi messages sent and received
 

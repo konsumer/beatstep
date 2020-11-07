@@ -1,149 +1,157 @@
 import chalk from 'chalk'
 
-import findConfig from 'find-config'
 import { promises as fs } from 'fs'
 import easymidi from 'easymidi'
 
-import { pads, BeatStep, controls } from './BeatStep'
+import { BeatStep, pads, controls, hex } from './BeatStep'
 import setup from './setup'
 
 // save the song
-async function saveSong (song) {
-  const file = findConfig('beatstep-song.json') || `${process.env.HOME}/.config/beatstep-song.json`
-  await fs.writeFile(file, JSON.stringify(song, null, 2))
+async function saveSong (song, songFile) {
+  await fs.writeFile(songFile, JSON.stringify(song, null, 2))
 }
 
 // load the song
-async function loadSong () {
-  const file = findConfig('beatstep-song.json') || `${process.env.HOME}/.config/beatstep-song.json`
+async function loadSong (songFile) {
   try {
-    return JSON.parse(await fs.readFile(file))
+    return JSON.parse(await fs.readFile(songFile))
   } catch (e) {
     return [...new Array(16)].map(() => [...new Array(16)].map(() => (new Array(16)).fill(false)))
   }
 }
 
-export const sequencer = async (input, output, name, channel) => {
+export const sequencer = async (input, output, name, channel, song) => {
   console.log(chalk.green('Press Ctrl-C to quit.'))
   const beatstep = new BeatStep(input, output)
-
   const voutput = new easymidi.Output(name, true)
-
   await setup(beatstep)
 
-  let stopPressed = false
-  let shiftPressed = false
-  let currentPattern = 0
-  let currentTrack = 0
+  let pressedStop = false
+  let pressedShift = false
   let playing = false
-  let step = 4
+  let currentTrack = 0
+  let currentPattern = 0
+  let step = 0
+  let bpm = 120
 
-  // TODO: figure out CHAN as I can track up/down for CHAN button, but not which channel was selected
-  // TODO: send initial stop command?
-
-  // this is the sequence: [pattern][track][step]
-  const pattern = await loadSong()
-
-  // show current pattern
-  async function showCurrentPattern () {
+  const showTrack = async () => {
+    for (const p in  pads) {
+      await beatstep.color(pads[p], p == currentTrack ? 'blue' : 'off')
+    }
+  }
+  
+  const showPattern = async () => {
+    for (const p in  pads) {
+      await beatstep.color(pads[p], p == currentPattern ? 'blue' : 'off')
+    }
+  }
+  
+  const showCurrent = async () => {
     await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
     for (const p in pads) {
       await beatstep.color(pads[p], pattern[currentPattern][currentTrack][p] ? (p == step && playing ? 'pink' : 'red') : (p == step && playing ? 'blue' : 'off'))
     }
   }
 
-  // show the current track
-  async function showTrackSelect () {
-    for (const p in pads) {
-      await beatstep.color(pads[p], p == currentTrack ? 'blue' : 'off')
-    }
-  }
-
-  async function showPatternSelect () {
-    for (const p in pads) {
-      await beatstep.color(pads[p], p == currentPattern ? 'blue' : 'off')
-    }
-  }
-
-  // convert a pad to a number 0-15
-  function padToNumber (note) {
-    let out = note - 0x60
-    // pads > 11 are numbered differently
-    if (out < 0) {
-      out = out + 68
-    }
-    return out
-  }
-
-  // initial view
-  await showCurrentPattern()
-
   beatstep.on('noteon', async ({ channel, note, velocity }) => {
-    if (channel === 0x02) {
-      if (note === controls.STOP) {
-        stopPressed = true
-        await showTrackSelect()
-        await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
+    if (channel === 0x0F) {
+      if (note === 0x00) {
+        pressedStop = true
+        await showTrack()
       }
-      if (note === controls.SHIFT) {
-        shiftPressed = true
-        await showPatternSelect()
-      }
-      if (note === controls.PLAY) {
+      if (note === 0x01) {
         playing = !playing
-        step = 0
-        await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
+        await showCurrent()
+      }
+      if (note === 0x02) {
+        pressedShift = true
+        await showPattern()
       }
     } else {
-      voutput.send('noteon', { channel, note: currentTrack + 60, velocity })
-    }
-  })
-
-  beatstep.on('noteoff', async ({ channel, note, velocity }) => {
-    if (channel === 0x02) {
-      if (note === controls.STOP) {
-        stopPressed = false
-        await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
-      }
-      if (note === controls.SHIFT) {
-        shiftPressed = false
-      }
-      if (note === controls.PLAY) {
-        await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
-      }
-      await showCurrentPattern()
-    } else if (channel === 0x01) {
-      if (stopPressed) {
-        currentTrack = padToNumber(note)
-        await showTrackSelect()
-      } else if (shiftPressed) {
-        currentPattern = padToNumber(note)
-        await showPatternSelect()
+      if (!pressedStop && !pressedShift) {
+        pattern[currentPattern][currentTrack][ note - 0x24 ] = ! pattern[currentPattern][currentTrack][ note - 0x24 ]
+        if (pattern[currentPattern][currentTrack][ note - 0x24 ]){
+          voutput.send('noteon', { channel, note: currentTrack + 0x24, velocity })
+        }
+        await saveSong (pattern, song)
+        await showCurrent()
       } else {
-        const s = padToNumber(note)
-        pattern[currentPattern][currentTrack][s] = !pattern[currentPattern][currentTrack][s]
-        await showCurrentPattern()
-        await saveSong(pattern)
-      }
-    } else {
-      voutput.send('noteoff', { channel, note: currentTrack + 60, velocity })
-    }
-  })
-
-  setInterval(() => {
-    if (playing) {
-      beatstep.color(pads[step], pattern[currentPattern][currentTrack][step] ? 'red' : 'off')
-      step = (step + 1) % 16
-      showCurrentPattern()
-      for (const t in pattern[currentPattern]) {
-        if (pattern[currentPattern][t][step]) {
-          voutput.send('noteon', { channel, note: 60 + parseInt(t), velocity: 0x7F })
-        } else {
-          voutput.send('noteoff', { channel, note: 60 + parseInt(t), velocity: 0x00 })
+        if (pressedStop) {
+          currentTrack = note - 0x24
+          await showTrack()
+        }
+        if (pressedShift) {
+          currentPattern = note - 0x24
+          await showPattern()
         }
       }
     }
-  }, 125)
+  })
+  
+  beatstep.on('noteoff', async ({ channel, note, velocity }) => {
+    if (channel === 0x0F) {
+      if (note === 0x00) {
+        pressedStop = false
+        await showCurrent()
+      }
+      if (note === 0x02) {
+        pressedShift = false
+        await showCurrent()
+      }
+    } else {
+      if (!pressedStop && !pressedShift) {
+        if (pattern[currentPattern][currentTrack][ note - 0x24 ]){
+          voutput.send('noteoff', { channel, note: currentTrack + 0x24, velocity })
+        }
+        await showCurrent()
+      }
+    }
+  })
+
+  // handle rate knob
+  beatstep.on('cc', ({ channel, controller, value }) => {
+    if (channel === 0x00 && controller === 0x10){
+      bpm = (value * 4) + 10
+      console.log(chalk.blue('BPM'), chalk.yellow(bpm))
+    }
+  })
+
+  // passthrough other sorts of messages
+  beatstep.on('activesense', (params) => voutput.send('activesense', params))
+  beatstep.on('cc', (params) => voutput.send('cc', params))
+  beatstep.on('channel aftertouch', (params) => voutput.send('channel aftertouch', params))
+  beatstep.on('clock', (params) => voutput.send('clock', params))
+  beatstep.on('continue', (params) => voutput.send('continue', params))
+  beatstep.on('mtc', (params) => voutput.send('mtc', params))
+  beatstep.on('pitch', (params) => voutput.send('pitch', params))
+  beatstep.on('poly', (params) => voutput.send('poly', params))
+  beatstep.on('position', (params) => voutput.send('position', params))
+  beatstep.on('program', (params) => voutput.send('program', params))
+  beatstep.on('reset', (params) => voutput.send('reset', params))
+  beatstep.on('select', (params) => voutput.send('select', params))
+  beatstep.on('start', (params) => voutput.send('start', params))
+  beatstep.on('stop', (params) => voutput.send('stop', params))
+
+  const pattern = await loadSong(song)
+  await showCurrent()
+
+  // this gets run once every sequencer beat
+  function tick() {
+    setTimeout(tick, 6000 / bpm)
+    if (playing) {
+      for (const t in pattern[currentPattern]) {
+        if (pattern[currentPattern][t][step]) {
+          voutput.send('noteon', { channel, note: 0x24 + parseInt(t), velocity: 0x7F })
+        } else {
+          voutput.send('noteoff', { channel, note: 0x24 + parseInt(t), velocity: 0x00 })
+        }
+      }
+      step = (step + 1) % 16
+      showCurrent()
+    }
+  }
+  
+  tick()
 }
 
 export default sequencer

@@ -4,6 +4,7 @@
 import { getInputs, getOutputs } from 'easymidi'
 import yargs from 'yargs'
 import { promises as fs } from 'fs'
+import findConfig from 'find-config'
 
 import { BeatStep } from './BeatStep'
 import sequencer from './sequencer'
@@ -27,6 +28,21 @@ yargs
       await beatstep.setPresets( JSON.parse(await fs.readFile(file)) )
     }
   )
+  .command('save <file>', 'Save a .beatstep preset file',
+    y => {
+      y
+      .option('input', {
+        alias: 'i',
+        description: 'MIDI input ID number (use `beatstep list`)',
+        type: 'number',
+        default: inputs.indexOf(inputs.find(d => d.includes('Arturia BeatStep'))) + 1
+      })
+    },
+    async ({ input, file }) => {
+      const beatstep = new BeatStep(inputs[input - 1])
+      await fs.writeFile(file, JSON.stringify(await beatstep.getPresets(), null, 2))
+    }
+  )
   .command('list', 'List MIDI devices',
     y => {},
     args => {
@@ -40,7 +56,7 @@ yargs
       })
     }
   )
-  .command('seq', 'Start a complex sequencer', y => {
+  .command('seq', 'Start sequencer', y => {
     y
       .option('input', {
         alias: 'i',
@@ -65,8 +81,13 @@ yargs
         description: 'The channel to send notes & CCs on',
         default: 0
       })
-  }, ({ input, output, name, channel }) => {
-    sequencer(inputs[input - 1], outputs[output - 1], name, channel)
+      .option('song', {
+        alias: 's',
+        description: 'The filename of the song to use',
+        default: findConfig('beatstep-song.json') || `${process.env.HOME}/.config/beatstep-song.json`
+      })
+  }, ({ input, output, name, channel, song}) => {
+    sequencer(inputs[input - 1], outputs[output - 1], name, channel, song)
   })
   .demandCommand()
   .argv
