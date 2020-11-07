@@ -3,12 +3,15 @@
 import chalk from 'chalk'
 import { getOutputs, getInputs } from 'easymidi'
 
-import { BeatStep } from './BeatStep'
+import { BeatStep, hex } from './BeatStep'
 import setup from './setup'
 
-const handler = ({ _type, ...params }) => {
+const handler = ({ _type, bytes, ...params }) => {
   console.log(chalk.green(_type))
-  console.log(Object.keys(params).map(p => `${chalk.blue(p)}: ${chalk.yellow(params[p])}`).join('\n  ') + '\n')
+  if (_type === 'sysex') {
+    console.log(`${chalk.blue('  bytes')}:`, bytes.map(n => chalk.yellow(hex(n))).join(', '))
+  }
+  console.log(Object.keys(params).map(p => `  ${chalk.blue(p)}: ${chalk.yellow(hex(params[p]))}`).join('\n') + '\n')
 }
 
 async function run () {
