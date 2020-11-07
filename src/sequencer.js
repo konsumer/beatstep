@@ -137,7 +137,7 @@ export const sequencer = async (input, output, name, channel, song) => {
 
   // this gets run once every sequencer beat
   function tick() {
-    setTimeout(tick, 6000 / bpm)
+    setTimeout(tick, 1000 * 60 / bpm)
     if (playing) {
       for (const t in pattern[currentPattern]) {
         if (pattern[currentPattern][t][step]) {
