@@ -6,7 +6,8 @@
     "start": "node -r esm src/cli.js seq",
     "build:cli": "pkg src/cli.js",
     "build:lib": "microbundle",
-    "prepublishOnly": "npm run build:lib"
+    "prepublishOnly": "npm run build:lib",
+    "test": "node -r esm src/test"
   },
   "bin": {
     "beatstep": "src/cli.js"
