@@ -159,4 +159,19 @@ export class BeatStep {
   noteMode (control, mode) {
     return this.set(0x06, control, controllerBehaviors[mode.toUpperCase()])
   }
+
+  // output a .beatstep file
+  getPresets () {
+
+  }
+
+  // apply a .beatstep file
+  setPresets (settings) {
+
+  }
+
+  // apply a .led firmware file
+  applyFirmware (ledFile) {
+
+  }
 }
