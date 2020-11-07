@@ -4,8 +4,8 @@
   "description": "Intercept beatstep and make it work in different ways",
   "scripts": {
     "start": "node -r esm src/cli.js seq",
-    "build:cli": "pkg src/cli.js",
-    "build:lib": "node node_modules/microbundle/dist/cli.js",
+    "build:cli": "microbundle --entry=src/cli.js --target node --output=dist/cli.js --no-sourcemap && pkg --out-path dist/cli -t node12-linux-x64,node12-macos-x64,node12-win-x64 dist/cli.js",
+    "build:lib": "microbundle --no-sourcemap --target node",
     "prepublishOnly": "npm run build:lib",
     "test": "node -r esm src/test"
   },
