@@ -160,18 +160,23 @@ export class BeatStep {
     return this.set(0x06, control, controllerBehaviors[mode.toUpperCase()])
   }
 
-  // output a .beatstep file
+  // output a .beatstep file object
   getPresets () {
 
   }
 
-  // apply a .beatstep file
-  setPresets (settings) {
-
+  // apply a .beatstep file object
+  async setPresets (settings) {
+    const { device, ...params } = settings
+    await Promise.all(Object.keys(params).map(async p => {
+      const [pp, cc] = p.split('_').map(n => parseInt(n))
+      const vv = params[p]
+      await this.set(pp, cc, vv)
+    }))
   }
 
   // apply a .led firmware file
-  applyFirmware (ledFile) {
+  updateFirmware (ledFile) {
 
   }
 }
