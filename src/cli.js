@@ -3,13 +3,30 @@
 
 import { getInputs, getOutputs } from 'easymidi'
 import yargs from 'yargs'
+import { promises as fs } from 'fs'
 
+import { BeatStep } from './BeatStep'
 import sequencer from './sequencer'
 
 const inputs = getInputs()
 const outputs = getOutputs()
 
 yargs
+  .command('load <file>', 'Load a .beatstep preset file',
+    y => {
+      y
+      .option('output', {
+        alias: 'o',
+        description: 'MIDI input ID number (use `beatstep list`)',
+        type: 'number',
+        default: outputs.indexOf(outputs.find(d => d.includes('Arturia BeatStep'))) + 1
+      })
+    },
+    async ({ output, file }) => {
+      const beatstep = new BeatStep(undefined, outputs[output - 1])
+      await beatstep.setPresets( JSON.parse(await fs.readFile(file)) )
+    }
+  )
   .command('list', 'List MIDI devices',
     y => {},
     args => {
@@ -51,4 +68,5 @@ yargs
   }, ({ input, output, name, channel }) => {
     sequencer(inputs[input - 1], outputs[output - 1], name, channel)
   })
+  .demandCommand()
   .argv
