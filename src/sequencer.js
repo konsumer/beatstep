@@ -1,9 +1,11 @@
 import chalk from 'chalk'
 
-import { pads, BeatStep, controls, hex } from './BeatStep'
 import findConfig from 'find-config'
 import { promises as fs } from 'fs'
 import easymidi from 'easymidi'
+
+import { pads, BeatStep, controls } from './BeatStep'
+import setup from './setup'
 
 // save the song
 async function saveSong (song) {
@@ -18,28 +20,6 @@ async function loadSong () {
     return JSON.parse(await fs.readFile(file))
   } catch (e) {
     return [...new Array(16)].map(() => [...new Array(16)].map(() => (new Array(16)).fill(false)))
-  }
-}
-
-// set initial state of controller
-async function setup (beatstep) {
-  // TODO: can I force controller into CNTRL mode?
-
-  for (const p in pads) {
-    await beatstep.mode(pads[p], 'NOTE')
-    await beatstep.noteChannel(pads[p], 0x01)
-    await beatstep.note(pads[p], 0x70 + p)
-
-    // this makes play stop working (so I can control it)
-    await beatstep.set(0x50, p, 0x01)
-  }
-
-  // TODO: is it possible to bind the level/rate knob?
-  const controlsv = Object.values(controls)
-  for (const c in controlsv) {
-    await beatstep.mode(controlsv[c], 'NOTE')
-    await beatstep.noteChannel(controlsv[c], 0x02)
-    await beatstep.note(controlsv[c], controlsv[c])
   }
 }
 
@@ -114,6 +94,8 @@ export const sequencer = async (input, output, name, channel) => {
         step = 0
         await beatstep.color(controls.PLAY, playing ? 'blue' : 'off')
       }
+    } else {
+      voutput.send('noteon', { channel, note: currentTrack + 60, velocity })
     }
   })
 
@@ -143,6 +125,8 @@ export const sequencer = async (input, output, name, channel) => {
         await showCurrentPattern()
         await saveSong(pattern)
       }
+    } else {
+      voutput.send('noteoff', { channel, note: currentTrack + 60, velocity })
     }
   })
 
@@ -153,9 +137,9 @@ export const sequencer = async (input, output, name, channel) => {
       showCurrentPattern()
       for (const t in pattern[currentPattern]) {
         if (pattern[currentPattern][t][step]) {
-          voutput.send('noteon', { channel, note: 48 + parseInt(t), velocity: 0x7F })
+          voutput.send('noteon', { channel, note: 60 + parseInt(t), velocity: 0x7F })
         } else {
-          voutput.send('noteoff', { channel, note: 48 + parseInt(t), velocity: 0x00 })
+          voutput.send('noteoff', { channel, note: 60 + parseInt(t), velocity: 0x00 })
         }
       }
     }
