@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node -r esm src/cli.js seq",
     "build:cli": "pkg src/cli.js",
-    "build:lib": "microbundle",
+    "build:lib": "node node_modules/microbundle/dist/cli.js",
     "prepublishOnly": "npm run build:lib",
     "test": "node -r esm src/test"
   },
