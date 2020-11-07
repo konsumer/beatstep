@@ -12,7 +12,7 @@ The Arturia BeatStep is a really nice-feeling device, that is pretty cheap (~$10
 
 It starts a virtual midi device that can be plugged into other software.
 
-> **IMPORTANT** Using the CLI will set your device up with specifc mappings and stuff, so make sure to back up your beatstep settings in the MIDI Control Center (from Arturia) program, if you care about them.
+> **IMPORTANT** Using the CLI will set your device up with specifc mappings and stuff, so make sure to back up your beatstep settings in the MIDI Control Center (from Arturia) program, or use `STORE`/`RECALL` if you care about them.
 
 ## installation
 
