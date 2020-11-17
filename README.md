@@ -4,7 +4,7 @@ I haven't really worked out the sequencer fully. I think I know how I want it to
 
 ## BeatStep Interceptor
 
-[![new beatstep sequencer](http://img.youtube.com/vi/dVYkL6qTRXc/0.jpg)](http://www.youtube.com/watch?v=dVYkL6qTRXc "See it in action")
+[![new beatstep sequencer](http://img.youtube.com/vi/WsXOr8mA1gY/0.jpg)](https://www.youtube.com/watch?v=WsXOr8mA1gY "See it in action")
 
 This is a command-line program to make the Arturia BeatStep work in different ways than the firmware is meant to.
 
