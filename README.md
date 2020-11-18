@@ -55,6 +55,7 @@ I am still working on this part. Here is how it currently works:
 - Press `SHIFT` to chose pattern
 - Press `STOP` to choose track
 - `PLAY` will play/stop the current pattern
+- `LEVEL/RATE` sets the speed of the sequencer.
 
 The notes it sends out are based on [hydrogen](http://hydrogen-music.org/) drumkits, which is a common mapping for drumkit-instruments starting at `C1` with a kick drum. Eventually, I can make this a configurable option (like a CLI flag that you can tell it the notes it can use for each track.)
 
@@ -90,13 +91,14 @@ Ideally, I could compile my own code, create my own led file (appears to be hex)
 
 ### TODO
 
-* Fill in the docs: api & docs.
-* Figure out `RATE` knob for BPM
+* Fill in the docs: api & usage
+* Figure out `RATE` knob for BPM (currently works, but outputs the wrong BPM on console)
 * Figure out `CHAN` so I can use that to switch tracks and use `SHIFT` to do something else (commands like copy/paste and sequencer controls would be cool)
 * Use `STORE`/`RECALL` for something other than intended. Would be good to fire save/load (maybe combined with `SHIFT` and `STOP` for track/pattern/song)
 * Figure out easier-to-compile MIDI lib (for cross-platform release building)
 * Different seqquencer styles: current (all drums in one instrument on one channel), seperate drum instruments, seperate channels, something for melodies
-* Better debug more that prints all midi messages sent and received
+* A mode that is like ableton (record inputs on all pads/knobs and allow playback)
+* Better debugging: more stuff and print all midi messages sent/received
 
 ## thanks
 
