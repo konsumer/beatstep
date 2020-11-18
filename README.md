@@ -8,7 +8,7 @@ I haven't really worked out the sequencer fully. I think I know how I want it to
 
 This is a command-line program to make the Arturia BeatStep work in different ways than the firmware is meant to.
 
-The Arturia BeatStep is a really nice-feeling device, that is pretty cheap (~$100 new.) The built-in firmware for the device is OK, but a bit wonky for sequencing complex drum-patterns. Since I don't have access to the firmware's source, I made this so I'd have a sequencer that works how I want.
+The Arturia BeatStep is a really nice-feeling device, that is pretty cheap (~$100 new.) The built-in firmware for the device is OK, but a bit wonky for sequencing complex drum-patterns. Since I don't have access to the firmware's source, I made this so I'd have a sequencer that works how I want. You can also use it as a command-line program to load/save beatstep preset files (even on linux, which the official software doesn't support.)
 
 It starts a virtual midi device that can be plugged into other software.
 
